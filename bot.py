@@ -1,15 +1,17 @@
+import asyncio
 import discord
 from discord.ext import commands
 from loguru import logger
 from env import discord_bot_token
-from command import example
+from command import example, search, setting
 
-
-def create_bot():
+async def create_bot():
     intents = discord.Intents.default()
     intents.message_content = True
     bot = commands.Bot(command_prefix='!', intents=intents)
     example.setup(bot)
+    await search.setup(bot)
+    await setting.setup(bot)
 
     @bot.event
     async def on_ready():
@@ -18,7 +20,6 @@ def create_bot():
 
     return bot
 
-
 async def sync_commands(bot):
     try:
         synced = await bot.tree.sync()
@@ -26,9 +27,8 @@ async def sync_commands(bot):
     except Exception as e:
         logger.error(f'Failed to sync commands: {e}')
 
-
 if __name__ == "__main__":
-    bot = create_bot()
+    bot = asyncio.run(create_bot())
     if discord_bot_token:
         bot.run(discord_bot_token)
     else:

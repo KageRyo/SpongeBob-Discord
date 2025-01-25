@@ -11,6 +11,7 @@ charset-normalizer == 3.4.1
 idna == 3.10 
 requests == 2.32.3 
 urllib3 == 2.3.0
+requests-oauthlib == 2.0.0
 
 # Logging
 loguru == 0.7.3
@@ -36,3 +37,13 @@ yarl == 1.18.3
 
 # Caching
 propcache == 0.2.1 
+cachetools == 5.5.1
+
+# Google authentication and API
+google-auth == 2.38.0
+google-auth-oauthlib == 1.2.1
+gspread == 6.1.4
+oauthlib == 3.2.2
+pyasn1 == 0.6.1
+pyasn1-modules == 0.4.1
+rsa == 4.9
