@@ -1,0 +1,28 @@
+/*
+ * This is an example `devcontainer.json` configuration file for setting up a development container in Visual Studio Code.
+ * 
+ * - `name`: The name of the development container.
+ * - `dockerFile`: Specifies the Dockerfile to use for building the container. (Make sure your Dockerfile path)
+ * - `context`: The build context for the Dockerfile.
+ * - `settings`: Custom settings for the VS Code environment inside the container.
+ *   - `terminal.integrated.shell.linux`: Sets the default shell to bash.
+ * - `extensions`: A list of VS Code extensions to be installed in the container.
+ *   - `ms-python.python`: Python extension for Visual Studio Code.
+ *   - `ms-python.vscode-pylance`: Pylance extension for Python language support.
+ * - `postCreateCommand`: Command to run after the container is created, typically used to install dependencies.
+ * - `remoteUser`: The user to use when connecting to the container.
+ */
+{
+    "name": "Spongebob-Discord",
+    "dockerFile": "dev.Dockerfile",
+    "context": "..",
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+    ],
+    "postCreateCommand": "pip install -r requirements.txt",
+    "remoteUser": "root"
+}
