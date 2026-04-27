@@ -169,3 +169,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Node / local runtime
+node_modules/
+bot.log
+.codex
