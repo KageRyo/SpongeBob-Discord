@@ -4,11 +4,9 @@ SpongeBob memes bot for Discord. Data source comes from a Google Sheet and is ex
 
 ## Features
 
-- `/spongebob random` 隨機抽一張海綿寶寶梗圖
-- `/spongebob random keyword:<關鍵字> version:<有字|無字>` 依條件隨機抽圖
-- `/spongebob search keyword:<關鍵字> version:<有字|無字>` 搜尋符合條件的梗圖
-- `/spongebob id id:<編號> version:<有字|無字>` 依編號查特定梗圖
-- `/spongebob reload` 重新抓取 Google Sheet
+- `/spongebob` 留空時隨機抽一張海綿寶寶梗圖
+- `/spongebob query:<關鍵字或編號> version:<有字|無字>` 單一入口完成搜尋或依編號取圖
+- `/spongebob-reload` 重新抓取 Google Sheet
 
 ## Data Source
 

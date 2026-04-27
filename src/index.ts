@@ -65,7 +65,7 @@ const handleCommand = async (interaction: Interaction) => {
       }
 
       const focusedOption = interaction.options.getFocused(true);
-      if (focusedOption.name !== "keyword") {
+      if (focusedOption.name !== "query") {
         await interaction.respond([]);
         return;
       }
@@ -100,76 +100,54 @@ const handleCommand = async (interaction: Interaction) => {
       }
 
       case "spongebob": {
-        const subcommand = interaction.options.getSubcommand();
-
-        if (subcommand === "reload") {
-          if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
-            await interaction.reply({
-              content: "只有具備 Manage Server 權限的成員可以重新載入資料。",
-              flags: MessageFlags.Ephemeral
-            });
-            return;
-          }
-
-          await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-          const memes = await memeRepository.getMemes(true);
-          await interaction.editReply(`已重新載入 ${memes.length} 筆海綿寶寶梗圖資料。`);
-          return;
-        }
-
+        await interaction.deferReply();
         const memes = await memeRepository.getMemes();
         const version = getRequestedVersion(interaction);
+        const query = interaction.options.getString("query")?.trim();
 
-        if (subcommand === "random") {
-          await interaction.deferReply();
-          const keyword = interaction.options.getString("keyword") ?? undefined;
-          const filtered = memeRepository.search(memes, keyword);
-
-          if (filtered.length === 0) {
-            await interaction.editReply(
-              keyword
-                ? `找不到符合「${keyword}」的海綿寶寶梗圖。`
-                : "目前沒有可用的海綿寶寶梗圖資料。"
-            );
+        if (!query) {
+          if (memes.length === 0) {
+            await interaction.editReply("目前沒有可用的海綿寶寶梗圖資料。");
             return;
           }
 
-          await interaction.editReply(renderMemeMessage(pickRandom(filtered), version));
+          await interaction.editReply(renderMemeMessage(pickRandom(memes), version));
           return;
         }
 
-        if (subcommand === "search") {
-          await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-          const keyword = interaction.options.getString("keyword", true);
-          const filtered = memeRepository.search(memes, keyword);
-
-          if (filtered.length === 0) {
-            await interaction.editReply(`找不到符合「${keyword}」的海綿寶寶梗圖。`);
-            return;
-          }
-
-          await interaction.editReply(renderSearchResult(filtered, keyword, version));
+        const memeById = memes.find((item) => item.id.toLowerCase() === query.toLowerCase());
+        if (memeById) {
+          await interaction.editReply(renderMemeMessage(memeById, version));
           return;
         }
 
-        if (subcommand === "id") {
-          await interaction.deferReply();
-          const id = interaction.options.getString("id", true).trim();
-          const meme = memes.find((item) => item.id.toLowerCase() === id.toLowerCase());
-
-          if (!meme) {
-            await interaction.editReply(`找不到編號 ${id} 的海綿寶寶梗圖。`);
-            return;
-          }
-
-          await interaction.editReply(renderMemeMessage(meme, version));
+        const filtered = memeRepository.search(memes, query);
+        if (filtered.length === 0) {
+          await interaction.editReply(`找不到符合「${query}」的海綿寶寶梗圖。`);
           return;
         }
 
-        await interaction.reply({
-          content: `Unknown subcommand: ${subcommand}`,
-          flags: MessageFlags.Ephemeral
-        });
+        if (filtered.length === 1) {
+          await interaction.editReply(renderMemeMessage(filtered[0], version));
+          return;
+        }
+
+        await interaction.editReply(renderSearchResult(filtered, query, version));
+        return;
+      }
+
+      case "spongebob-reload": {
+        if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
+          await interaction.reply({
+            content: "只有具備 Manage Server 權限的成員可以重新載入資料。",
+            flags: MessageFlags.Ephemeral
+          });
+          return;
+        }
+
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        const memes = await memeRepository.getMemes(true);
+        await interaction.editReply(`已重新載入 ${memes.length} 筆海綿寶寶梗圖資料。`);
         return;
       }
 
