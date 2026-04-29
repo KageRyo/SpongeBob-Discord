@@ -173,4 +173,5 @@ cython_debug/
 # Node / local runtime
 node_modules/
 bot.log
+.runtime/
 .codex

@@ -8,6 +8,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx watch src/index.ts",
+    "start:bg": "bash scripts/start-background.sh",
+    "stop:bg": "bash scripts/stop-background.sh",
+    "status:bg": "bash scripts/status-background.sh",
     "start": "node dist/index.js"
   },
   "engines": {
