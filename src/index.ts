@@ -8,6 +8,7 @@ import {
   REST,
   Routes
 } from "discord.js";
+import type { RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
 
 import { config } from "./config.js";
 import { commandData, type KnownCommandName, type MemeVersion } from "./discord/commands.js";
@@ -15,21 +16,31 @@ import { renderMemeMessage, renderSearchResult } from "./discord/renderMeme.js";
 import { GoogleSheetRepository } from "./services/googleSheetRepository.js";
 
 const memeRepository = new GoogleSheetRepository();
+const ownCommandNames = new Set(commandData.map((command) => command.name));
 
-const registerCommands = async () => {
-  const rest = new REST({ version: "10" }).setToken(config.discordToken);
-
+const registerCommand = async (
+  rest: REST,
+  command: RESTPostAPIApplicationCommandsJSONBody
+) => {
   if (config.discordGuildId) {
-    await rest.put(
+    await rest.post(
       Routes.applicationGuildCommands(config.discordClientId, config.discordGuildId),
-      { body: commandData }
+      { body: command }
     );
     return;
   }
 
-  await rest.put(Routes.applicationCommands(config.discordClientId), {
-    body: commandData
+  await rest.post(Routes.applicationCommands(config.discordClientId), {
+    body: command
   });
+};
+
+const registerCommands = async () => {
+  const rest = new REST({ version: "10" }).setToken(config.discordToken);
+
+  for (const command of commandData) {
+    await registerCommand(rest, command);
+  }
 };
 
 const pickRandom = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)];
@@ -59,8 +70,7 @@ const replyWithError = async (interaction: ChatInputCommandInteraction, message:
 const handleCommand = async (interaction: Interaction) => {
   if (interaction.isAutocomplete()) {
     try {
-      if (interaction.commandName !== "spongebob") {
-        await interaction.respond([]);
+      if (!ownCommandNames.has(interaction.commandName)) {
         return;
       }
 
@@ -81,12 +91,18 @@ const handleCommand = async (interaction: Interaction) => {
       return;
     } catch (error) {
       console.error("Autocomplete failed:", error);
-      await interaction.respond([]);
+      if (!interaction.responded) {
+        await interaction.respond([]);
+      }
       return;
     }
   }
 
   if (!interaction.isChatInputCommand()) {
+    return;
+  }
+
+  if (!ownCommandNames.has(interaction.commandName)) {
     return;
   }
 
@@ -152,10 +168,7 @@ const handleCommand = async (interaction: Interaction) => {
       }
 
       default:
-        await interaction.reply({
-          content: `Unknown command: ${commandName}`,
-          flags: MessageFlags.Ephemeral
-        });
+        return;
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

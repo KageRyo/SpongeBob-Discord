@@ -13,7 +13,7 @@ fi
 
 BOT_PID="$(cat "$PID_FILE")"
 
-if kill -0 "$BOT_PID" 2>/dev/null; then
+if ps -p "$BOT_PID" >/dev/null 2>&1; then
   echo "SpongeBob-Discord is running with PID $BOT_PID."
   echo "Log file: $LOG_FILE"
   exit 0
