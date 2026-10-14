@@ -69,3 +69,7 @@ npm start
 - 目前假設 Google Sheet 可被公開讀取。
 - 這份試算表目前可直接辨識 `流水號 / 名稱 / i.imgur / 無文字版本 / 維基集數 / ESFIO` 欄位。
 - 若試算表的圖片欄位不是直接圖片網址而是 Google Drive / 頁面連結，Discord embed 可能無法直接預覽，這時仍會附上來源連結。
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
